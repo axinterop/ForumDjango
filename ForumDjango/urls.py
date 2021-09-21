@@ -16,11 +16,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from boards import views
+from boards import views as boards_views
+from accounts import views as accounts_views
 
 urlpatterns = [
-    path('', views.home, name="home"),
-    path('boards/<int:board_id>/', views.board_topics, name="board_topics"),
-    path('boards/<int:board_id>/new/', views.new_topic, name="new_topic"),
+    path('', boards_views.home, name="home"),
     path('admin/', admin.site.urls),
+    # accounts_views
+    path('signup/', accounts_views.signup, name='signup'),
+    # boards_views
+    path('boards/<int:board_id>/', boards_views.board_topics, name="board_topics"),
+    path('boards/<int:board_id>/new/', boards_views.new_topic, name="new_topic"),
 ]

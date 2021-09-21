@@ -2,6 +2,8 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse, resolve
 
+from accounts.views import signup
+from boards.forms import NewTopicForm
 from boards.models import Board, Topic, Post
 from boards.views import home, board_topics, new_topic
 
@@ -124,4 +126,15 @@ class NewTopicTests(TestCase):
         url = reverse('new_topic', kwargs={'board_id': 1})
         response = self.client.get(url)
         form = response.context.get('form')
-        self.assertIsInstance(form, NewTopicTests)
+        self.assertIsInstance(form, NewTopicForm)
+
+
+class SignUpTests(TestCase):
+    def test_signup_status_code(self):
+        url = reverse('signup')
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, 200)
+
+    def test_signup_url_resolves_signup_view(self):
+        view = resolve('/signup/')
+        self.assertEquals(view.func, signup)
