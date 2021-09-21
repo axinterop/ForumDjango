@@ -8,22 +8,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Archivo&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    {% block stylesheet %}{% endblock %}
 </head>
 <body>
+{% block body %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">Django Forum</a>
+        </div>
+    </nav>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" href="{% url 'home' %}">Django Forum</a>
-    </div>
-</nav>
-
-<div class="container">
-    <ol class="breadcrumb my-4">
-        {% block breacrumb %}
+        <ol class="breadcrumb my-4">
+            {% block breacrumb %}
+            {% endblock %}
+        </ol>
+        {% block content %}
         {% endblock %}
-    </ol>
-    {% block content %}
-    {% endblock %}
-</div>
+    </div>
+{% endblock %}
 </body>
 </html>
