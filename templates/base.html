@@ -40,7 +40,7 @@
                 </ul>
                 {% else %}
                     <div class="d-inline">
-                        <a href="#" class="btn btn-outline-secondary">Log in</a>
+                        <a href="{% url 'login' %}" class="btn btn-outline-secondary">Log in</a>
                         <a href="{% url 'signup' %}" class="btn btn-primary">Sign up</a>
                     </div>
                 {% endif %}
