@@ -1,0 +1,18 @@
+body {
+    background-image: url("../img/bg-pattern.png");
+}
+
+.logo {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 1000;
+}
+
+.logo a {
+    color: rgba(0, 0, 0, 9);
+}
+
+.logo a,
+.logo a:hover,
+.logo a:active {
+    text-decoration: none;
+}
