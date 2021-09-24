@@ -30,7 +30,7 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="#">My account</a></li>
-                            <li><a class="dropdown-item" href="{% url 'password_reset' %}">Change password</a></li>
+                            <li><a class="dropdown-item" href="{% url 'password_change' %}">Change password</a></li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
@@ -48,8 +48,8 @@
         </div>
     </nav>
 
-    <div class="container">
-        <ol class="breadcrumb my-4">
+    <div class="container ">
+        <ol class="breadcrumb p-3 my-2 bg-dark bg-opacity-10 rounded">
             {% block breacrumb %}
             {% endblock %}
         </ol>
