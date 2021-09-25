@@ -11,7 +11,7 @@
     <li class="breadcrumb-item">
         <a href="{% url 'board_topics' topic.board.id %}" class="text-decoration-none">{{ topic.board.name }}</a>
     </li>
-    <li class="breadcrumb-item active">{{ topic.subject }}</li>
+    <li class="breadcrumb-item active">{{ topic.subject|truncatechars:30 }}</li>
 {% endblock %}
 
 {% block content %}

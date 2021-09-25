@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.db.models import Count
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
@@ -15,14 +16,22 @@ class BoardListView(ListView):
     template_name = 'home.html'
 
 
-def board_topics(request, board_id):
-    board = get_object_or_404(Board, id=board_id)
-    topics = board.topics.order_by('-last_updated').annotate(replies=Count('posts') - 1)
-    context = {
-        'board': board,
-        'topics': topics,
-    }
-    return render(request, 'topics.html', context)
+class TopicListView(ListView):
+    model = Topic
+    context_object_name = 'topics'
+    template_name = 'topics.html'
+    paginate_by = 20
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['board'] = self.board
+        return context
+
+    def get_queryset(self):
+        self.board = get_object_or_404(Board, id=self.kwargs.get('board_id'))
+        queryset = self.board.topics.order_by('last_updated').\
+            annotate(replies=Count('posts') - 1)
+        return queryset
 
 
 @login_required
