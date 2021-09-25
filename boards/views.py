@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 from django.shortcuts import render, get_object_or_404, redirect
 
 from boards.forms import NewTopicForm, PostForm
@@ -13,7 +14,11 @@ def home(request):
 
 def board_topics(request, board_id):
     board = get_object_or_404(Board, id=board_id)
-    context = {'board': board}
+    topics = board.topics.order_by('-last_updated').annotate(replies=Count('posts') - 1)
+    context = {
+        'board': board,
+        'topics': topics,
+    }
     return render(request, 'topics.html', context)
 
 
@@ -45,6 +50,8 @@ def new_topic(request, board_id):
 
 def topic_posts(request, board_id, topic_id):
     topic = get_object_or_404(Topic, board_id=board_id, id=topic_id)
+    topic.views += 1
+    topic.save()
     context = {
         'topic': topic,
     }

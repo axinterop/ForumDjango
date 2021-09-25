@@ -18,7 +18,7 @@
         {% for board in boards %}
             <tr>
                 <td>
-                    <a href="{% url 'board_topics' board.id %}">{{ board.name }}</a>
+                    <a href="{% url 'board_topics' board.id %}" class="text-decoration-none">{{ board.name }}</a>
                     <small class="text-muted d-block">{{ board.description }}</small>
                 </td>
                 <td class="align-middle">{{ board.get_posts_count }}</td>
@@ -27,7 +27,7 @@
                     {% with board.get_last_post as post %}
                         {% if post %}
                             <small>
-                                <a href="{% url 'topic_posts' board.id post.topic.id %}">
+                                <a href="{% url 'topic_posts' board.id post.topic.id %}" class="text-decoration-none">
                                     By {{ post.created_by.username }} at {{ post.created_at }}
                                 </a>
                             </small>
