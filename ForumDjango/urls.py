@@ -48,4 +48,5 @@ urlpatterns = [
     # boards_views
     path('boards/<int:board_id>/', boards_views.board_topics, name="board_topics"),
     path('boards/<int:board_id>/new/', boards_views.new_topic, name="new_topic"),
+    path('boards/<int:board_id>/topics/<int:topic_id>/', boards_views.topic_posts, name='topic_posts')
 ]
