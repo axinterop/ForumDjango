@@ -1,6 +1,9 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.shortcuts import render, get_object_or_404, redirect
+from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views.generic import UpdateView
 
 from boards.forms import NewTopicForm, PostForm
 from boards.models import Board, Post, Topic
@@ -76,3 +79,24 @@ def reply_topic(request, board_id, topic_id):
         'form': form,
     }
     return render(request, 'reply_topic.html', context)
+
+
+@method_decorator(login_required, name='dispatch')
+class PostUpdateView(UpdateView):
+    model = Post
+    fields = ('message',)
+    template_name = 'edit_post.html'
+    pk_url_kwarg = 'post_id'
+    context_object_name = 'post'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        # Prevents non-owners from editing the post
+        return queryset.filter(created_by=self.request.user)
+
+    def form_valid(self, form):
+        post = form.save(commit=False)
+        post.updated_by = self.request.user
+        post.updated_at = timezone.now()
+        post.save()
+        return redirect('topic_posts', board_id=post.topic.board.id, topic_id=post.topic.id)

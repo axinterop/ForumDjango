@@ -8,7 +8,9 @@
 
 {% block breacrumb %}
     <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">Boards</a></li>
-    <li class="breadcrumb-item"><a href="{% url 'board_topics' topic.board.id %}" class="text-decoration-none">{{ topic.board.name }}</a></li>
+    <li class="breadcrumb-item">
+        <a href="{% url 'board_topics' topic.board.id %}" class="text-decoration-none">{{ topic.board.name }}</a>
+    </li>
     <li class="breadcrumb-item active">{{ topic.subject }}</li>
 {% endblock %}
 
@@ -45,7 +47,8 @@
                         {% if post.created_by == user %}
                             <div class="row mt-3">
                                 <div class="col">
-                                    <a href="#" class="text-muted" role="button">Edit</a>
+                                    <a href="{% url 'edit_post' post.topic.board.id post.topic.id post.id %}"
+                                       class="text-muted" role="button">Edit</a>
                                 </div>
                             </div>
                         {% endif %}

@@ -1,35 +1,57 @@
 from django.contrib.auth.models import User
+from django.forms import ModelForm
 from django.test import TestCase
 from django.urls import reverse, resolve
 
-from boards.forms import PostForm
-from boards.models import Board, Topic, Post
-from boards.views import reply_topic
+from boards.models import Board, Post, Topic
+from boards.views import PostUpdateView
 
 
-class ReplyTopicTestCase(TestCase):
+class PostUpdateViewTestCase(TestCase):
     """
-    Base test case to be used in all `reply_topic` view tests
+    Base test case to be used in all `PostUpdateView` view tests
     """
 
     def setUp(self):
-        self.board = Board.objects.create(name='Django', description='Django board.')
+        self.board = Board.objects.create(name='Python', description='Python board.')
         self.username = 'john'
         self.password = '123'
         user = User.objects.create_user(username=self.username, email='john@doe.com', password=self.password)
         self.topic = Topic.objects.create(subject="Hello, world!", board=self.board, starter=user)
-        Post.objects.create(message="Lorem ipsum dolor sit amet", topic=self.topic, created_by=user)
-        self.url = reverse('reply_topic', kwargs={'board_id': self.board.id, 'topic_id': self.topic.id})
+        self.post = Post.objects.create(message="Lorem ipsum dolor sit amet", topic=self.topic, created_by=user)
+        self.url = reverse('edit_post', kwargs={
+            'board_id': self.board.id, 'topic_id': self.topic.id, 'post_id': self.post.id
+        })
 
 
-class LoginRequiredReplyTopicTests(ReplyTopicTestCase):
+class LoginRequiredPostUpdateViewTests(PostUpdateViewTestCase):
     def test_redirection(self):
         login_url = reverse('login')
         response = self.client.get(self.url)
         self.assertRedirects(response, '{}?next={}'.format(login_url, self.url))
 
 
-class ReplyTopicTests(ReplyTopicTestCase):
+class UnauthorizedPostUpdateViewTests(PostUpdateViewTestCase):
+    def setUp(self):
+        """
+        Create a new user different from the one who posted
+        """
+        super().setUp()
+        username = 'kevin'
+        password = '321'
+        user = User.objects.create_user(username=username, email='kevin@doe.com', password=password)
+        self.client.login(username=username, password=password)
+        self.response = self.client.get(self.url)
+
+    def test_status_code(self):
+        """
+        A post should be edited only by the owner.
+        Unauthorized users should get a 404 response (Page Not Found)
+        """
+        self.assertEquals(self.response.status_code, 404)
+
+
+class PostUpdateViewTests(PostUpdateViewTestCase):
     def setUp(self):
         super().setUp()
         self.client.login(username=self.username, password=self.password)
@@ -39,15 +61,15 @@ class ReplyTopicTests(ReplyTopicTestCase):
         self.assertEquals(self.response.status_code, 200)
 
     def test_view_function(self):
-        view = resolve('/boards/1/topics/1/reply/')
-        self.assertEquals(view.func, reply_topic)
+        view = resolve('/boards/1/topics/1/posts/1/edit/')
+        self.assertEquals(view.func.view_class, PostUpdateView)
 
     def test_csrf(self):
         self.assertContains(self.response, 'csrfmiddlewaretoken')
 
     def test_contains_form(self):
         form = self.response.context.get('form')
-        self.assertIsInstance(form, PostForm)
+        self.assertIsInstance(form, ModelForm)
 
     def test_form_inputs(self):
         """
@@ -57,11 +79,11 @@ class ReplyTopicTests(ReplyTopicTestCase):
         self.assertContains(self.response, '<textarea', 1)
 
 
-class SuccessfulReplyTopicTests(ReplyTopicTestCase):
+class SuccessfulPostUpdateTests(PostUpdateViewTestCase):
     def setUp(self):
         super().setUp()
         self.client.login(username=self.username, password=self.password)
-        self.response = self.client.post(self.url, {'message': 'cool message'})
+        self.response = self.client.post(self.url, {'message': 'edited message'})
 
     def test_redirection(self):
         """
@@ -70,30 +92,20 @@ class SuccessfulReplyTopicTests(ReplyTopicTestCase):
         topic_posts_url = reverse('topic_posts', kwargs={'board_id': self.board.id, 'topic_id': self.topic.id})
         self.assertRedirects(self.response, topic_posts_url)
 
-    def test_reply_creation(self):
-        """
-        The total post count should be 2
-        The one created in the `ReplyTopicTestCase` setUp
-        and another created by the post data in this class
-        """
-        self.assertEquals(Post.objects.count(), 2)
+    def test_post_changed(self):
+        self.post.refresh_from_db()
+        self.assertEquals(self.post.message, 'edited message')
 
 
-class InvalidReplyTopicTests(ReplyTopicTestCase):
+class InvalidReplyTopicTests(PostUpdateViewTestCase):
     def setUp(self):
         super().setUp()
         self.client.login(username=self.username, password=self.password)
         self.response = self.client.post(self.url, {})
 
     def test_status_code(self):
-        """
-        An invalid form submission should return to the same page
-        """
         self.assertEquals(self.response.status_code, 200)
 
     def test_form_errors(self):
         form = self.response.context.get('form')
         self.assertTrue(form.errors)
-
-    def test_didnt_create_post(self):
-        self.assertEquals(Post.objects.count(), 1)

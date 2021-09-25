@@ -53,4 +53,6 @@ urlpatterns = [
     path('boards/<int:board_id>/new/', boards_views.new_topic, name="new_topic"),
     path('boards/<int:board_id>/topics/<int:topic_id>/', boards_views.topic_posts, name='topic_posts'),
     path('boards/<int:board_id>/topics/<int:topic_id>/reply/', boards_views.reply_topic, name='reply_topic'),
+    path('boards/<int:board_id>/topics/<int:topic_id>/posts/<int:post_id>/edit/',
+         boards_views.PostUpdateView.as_view(), name='edit_post')
 ]
