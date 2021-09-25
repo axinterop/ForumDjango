@@ -21,8 +21,16 @@ from accounts import views as accounts_views
 from boards import views as boards_views
 
 urlpatterns = [
-    path('', boards_views.home, name="home"),
     path('admin/', admin.site.urls),
+
+    # boards_views
+    path('', boards_views.BoardListView.as_view(), name="home"),
+    path('boards/<int:board_id>/', boards_views.board_topics, name="board_topics"),
+    path('boards/<int:board_id>/new/', boards_views.new_topic, name="new_topic"),
+    path('boards/<int:board_id>/topics/<int:topic_id>/', boards_views.topic_posts, name='topic_posts'),
+    path('boards/<int:board_id>/topics/<int:topic_id>/reply/', boards_views.reply_topic, name='reply_topic'),
+    path('boards/<int:board_id>/topics/<int:topic_id>/posts/<int:post_id>/edit/',
+         boards_views.PostUpdateView.as_view(), name='edit_post'),
 
     # accounts_views
     path('signup/', accounts_views.signup, name='signup'),
@@ -47,12 +55,4 @@ urlpatterns = [
     path('settings/password/done/',
          auth_views.PasswordChangeDoneView.as_view(template_name='password_change_done.html'),
          name='password_change_done'),
-
-    # boards_views
-    path('boards/<int:board_id>/', boards_views.board_topics, name="board_topics"),
-    path('boards/<int:board_id>/new/', boards_views.new_topic, name="new_topic"),
-    path('boards/<int:board_id>/topics/<int:topic_id>/', boards_views.topic_posts, name='topic_posts'),
-    path('boards/<int:board_id>/topics/<int:topic_id>/reply/', boards_views.reply_topic, name='reply_topic'),
-    path('boards/<int:board_id>/topics/<int:topic_id>/posts/<int:post_id>/edit/',
-         boards_views.PostUpdateView.as_view(), name='edit_post')
 ]
