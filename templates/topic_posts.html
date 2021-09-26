@@ -18,8 +18,7 @@
     <div class="my-3">
         <a href="{% url 'reply_topic' topic.board.id topic.id %}" class="btn btn-primary">Reply</a>
     </div>
-
-    {% for post in topic.posts.all %}
+    {% for post in posts %}
         <div class="card mb-2 {% if forloop.first %}border-dark{% endif %}">
             {% if forloop.first %}
                 <div class="card-header text-white bg-dark">
@@ -57,4 +56,7 @@
             </div>
         </div>
     {% endfor %}
+
+    {% include 'includes/pagination.html' %}
+
 {% endblock %}

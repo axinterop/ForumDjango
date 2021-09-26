@@ -1,5 +1,4 @@
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
 from django.db.models import Count
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
@@ -29,8 +28,26 @@ class TopicListView(ListView):
 
     def get_queryset(self):
         self.board = get_object_or_404(Board, id=self.kwargs.get('board_id'))
-        queryset = self.board.topics.order_by('last_updated').\
-            annotate(replies=Count('posts') - 1)
+        queryset = self.board.topics.order_by('last_updated').annotate(replies=Count('posts') - 1)
+        return queryset
+
+
+class PostListView(ListView):
+    model = Post
+    context_object_name = 'posts'
+    template_name = 'topic_posts.html'
+    paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        self.topic.views += 1
+        self.topic.save()
+        context['topic'] = self.topic
+        return context
+
+    def get_queryset(self):
+        self.topic = get_object_or_404(Topic, board_id=self.kwargs.get('board_id'), id=self.kwargs.get('topic_id'))
+        queryset = self.topic.posts.order_by('created_at')
         return queryset
 
 
@@ -58,16 +75,6 @@ def new_topic(request, board_id):
         'form': form,
     }
     return render(request, 'new_topic.html', context)
-
-
-def topic_posts(request, board_id, topic_id):
-    topic = get_object_or_404(Topic, board_id=board_id, id=topic_id)
-    topic.views += 1
-    topic.save()
-    context = {
-        'topic': topic,
-    }
-    return render(request, 'topic_posts.html', context)
 
 
 @login_required
