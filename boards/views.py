@@ -13,13 +13,13 @@ from boards.models import Board, Post, Topic
 class BoardListView(ListView):
     model = Board
     context_object_name = 'boards'
-    template_name = 'home.html'
+    template_name = 'boards/home.html'
 
 
 class TopicListView(ListView):
     model = Topic
     context_object_name = 'topics'
-    template_name = 'topics.html'
+    template_name = 'boards/topics.html'
     paginate_by = 10
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -36,7 +36,7 @@ class TopicListView(ListView):
 class PostListView(ListView):
     model = Post
     context_object_name = 'posts'
-    template_name = 'topic_posts.html'
+    template_name = 'boards/topic_posts.html'
     paginate_by = 20
 
     def get_context_data(self, **kwargs):
@@ -80,7 +80,7 @@ def new_topic(request, board_id):
         'board': board,
         'form': form,
     }
-    return render(request, 'new_topic.html', context)
+    return render(request, 'boards/new_topic.html', context)
 
 
 @login_required
@@ -103,7 +103,7 @@ def reply_topic(request, board_id, topic_id):
                 id=post.id,
                 page=topic.get_page_count()
             )
-
+            print(topic.get_page_count())
             return redirect(topic_post_url)
     else:
         form = PostForm()
@@ -111,14 +111,14 @@ def reply_topic(request, board_id, topic_id):
         'topic': topic,
         'form': form,
     }
-    return render(request, 'reply_topic.html', context)
+    return render(request, 'boards/reply_topic.html', context)
 
 
 @method_decorator(login_required, name='dispatch')
 class PostUpdateView(UpdateView):
     model = Post
     fields = ('message',)
-    template_name = 'edit_post.html'
+    template_name = 'boards/edit_post.html'
     pk_url_kwarg = 'post_id'
     context_object_name = 'post'
 
