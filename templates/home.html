@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load humanize %}
+
 {% block breacrumb %}
     <li class="breadcrumb-item active">Boards</li>
 {% endblock %}
@@ -28,7 +30,7 @@
                         {% if post %}
                             <small>
                                 <a href="{% url 'topic_posts' board.id post.topic.id %}" class="text-decoration-none">
-                                    By {{ post.created_by.username }} at {{ post.created_at }}
+                                    {{ post.created_at|naturaltime }} by {{ post.created_by.username }}
                                 </a>
                             </small>
                         {% else %}
