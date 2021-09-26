@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from boards.models import User
 from django.forms import ModelForm
 from django.test import TestCase
 from django.urls import reverse, resolve

@@ -1,9 +1,9 @@
-from django.contrib.auth.models import User
 from django.forms import ModelForm
 from django.test import TestCase
 from django.urls import reverse, resolve
 
 from accounts.views import UserUpdateView
+from boards.models import User
 
 
 class UserUpdateViewTestCase(TestCase):
@@ -71,19 +71,12 @@ class SuccessfulUserUpdateTests(UserUpdateViewTestCase):
         self.user.refresh_from_db()
         self.assertEquals(self.user.email, 'anotheremail@gmail.com')
 
-    def test_no_data_provided_status_code(self):
-        """
-        An empty form submission should redirect to the same page
-        """
-        response = self.client.post(self.url, {})
-        self.assertEquals(response.status_code, 302)
-
 
 class InvalidUserUpdateTests(UserUpdateViewTestCase):
     def setUp(self):
         super().setUp()
         self.client.login(username=self.username, password=self.password)
-        self.response = self.client.post(self.url, {'email': '1'})
+        self.response = self.client.post(self.url, {})
 
     def test_not_valid_email_status_code(self):
         """

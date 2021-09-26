@@ -1,6 +1,6 @@
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
-from django.contrib.auth.models import User
+from boards.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
 from django.test import TestCase

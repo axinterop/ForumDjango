@@ -1,12 +1,12 @@
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import UpdateView
 
 from accounts.forms import SignUpForm
+from boards.models import User
 
 
 def signup(request):
