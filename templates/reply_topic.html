@@ -6,16 +6,19 @@
     Post a reply
 {% endblock %}
 
-{% block breacrumb %}
-    <li class="breadcrumb-item"><a href="{% url 'home' %}">Boards</a></li>
-    <li class="breadcrumb-item"><a href="{% url 'board_topics' topic.board.id %}">{{ topic.board.name }}</a></li>
-    <li class="breadcrumb-item"><a href="{% url 'topic_posts' topic.board.id topic.id %}">{{ topic.subject }}</a></li>
-    <li class="breadcrumb-item active">Post a reply</li>
-{% endblock %}
 
 {% block stylesheet %}
     <link rel="stylesheet" href="{% static 'css/simplemde.min.css' %}">
 {% endblock %}
+
+{% block breacrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Boards</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'board_topics' topic.board.id %}">{{ topic.board.name }}</a></li>
+    <li class="breadcrumb-item"><a
+            href="{% url 'topic_posts' topic.board.id topic.id %}">{{ topic.subject|truncatechars:30 }}</a></li>
+    <li class="breadcrumb-item active">Post a reply</li>
+{% endblock %}
+
 
 {% block content %}
     <form method="post" class="mb-3" novalidate>
@@ -44,7 +47,7 @@
 {% endblock %}
 
 {% block javascript %}
-    <script src="{% static 'js/simplemde.min.js '%}"></script>
+    <script src="{% static 'js/simplemde.min.js ' %}"></script>
     <script>
         var simplemde = new SimpleMDE();
     </script>

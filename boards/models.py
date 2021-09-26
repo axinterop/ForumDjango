@@ -4,6 +4,7 @@ from django.utils.safestring import mark_safe
 from django.utils.text import Truncator
 from markdown import markdown
 
+
 class User(AbstractUser):
     email = models.EmailField('email address', unique=True)
 
@@ -26,7 +27,7 @@ class Topic(models.Model):
     subject = models.CharField(max_length=255)
     last_updated = models.DateTimeField(auto_now_add=True)
     board = models.ForeignKey(Board, related_name='topics', on_delete=models.CASCADE)
-    starter = models.ForeignKey(User, related_name='topics', on_delete=models.SET_NULL, null=True)
+    starter = models.ForeignKey(User, related_name='topics', on_delete=models.CASCADE)
     views = models.PositiveIntegerField(default=0)
 
     def __str__(self):
@@ -38,8 +39,8 @@ class Post(models.Model):
     topic = models.ForeignKey(Topic, related_name='posts', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True)
-    created_by = models.ForeignKey(User, related_name='posts', on_delete=models.SET_NULL, null=True)
-    updated_by = models.ForeignKey(User, related_name='+', on_delete=models.SET_NULL, null=True)
+    created_by = models.ForeignKey(User, related_name='posts', on_delete=models.CASCADE)
+    updated_by = models.ForeignKey(User, related_name='+', on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         truncated_message = Truncator(self.message)

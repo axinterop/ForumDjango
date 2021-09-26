@@ -40,8 +40,13 @@ class PostListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        self.topic.views += 1
-        self.topic.save()
+
+        session_key = f'viewed_topic_{self.topic.id}'
+        if not self.request.session.get(session_key, False):
+            self.topic.views += 1
+            self.topic.save()
+            self.request.session[session_key] = True
+
         context['topic'] = self.topic
         return context
 
@@ -87,6 +92,10 @@ def reply_topic(request, board_id, topic_id):
             post.topic = topic
             post.created_by = request.user
             post.save()
+
+            topic.last_updated = timezone.now()
+            topic.save()
+
             return redirect('topic_posts', board_id=board_id, topic_id=topic_id)
     else:
         form = PostForm()
