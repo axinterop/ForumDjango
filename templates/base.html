@@ -29,7 +29,7 @@
                             <em>{{ user.username }}</em>
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="#">My account</a></li>
+                            <li><a class="dropdown-item" href="{% url 'my_account' %}">My account</a></li>
                             <li><a class="dropdown-item" href="{% url 'password_change' %}">Change password</a></li>
                             <li>
                                 <hr class="dropdown-divider">
@@ -48,7 +48,7 @@
         </div>
     </nav>
 
-    <div class="container ">
+    <div class="container">
         <ol class="breadcrumb p-3 my-2 bg-dark bg-opacity-10 rounded">
             {% block breacrumb %}
             {% endblock %}

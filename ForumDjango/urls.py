@@ -37,7 +37,6 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 
-    # password_reset
     path('reset/', auth_views.PasswordResetView.as_view(
         template_name='password_reset.html', email_template_name='password_reset_email.html',
         subject_template_name='password_reset_subject.txt', ), name='password_reset'),
@@ -49,7 +48,7 @@ urlpatterns = [
     path('reset/complete/', auth_views.PasswordResetCompleteView.as_view(template_name='password_reset_complete.html'),
          name='password_reset_complete'),
 
-    # password_change
+    path('settings/account/', accounts_views.UserUpdateView.as_view(), name='my_account'),
     path('settings/password/', auth_views.PasswordChangeView.as_view(template_name='password_change.html'),
          name='password_change'),
     path('settings/password/done/',

@@ -97,7 +97,7 @@ class SuccessfulPostUpdateTests(PostUpdateViewTestCase):
         self.assertEquals(self.post.message, 'edited message')
 
 
-class InvalidReplyTopicTests(PostUpdateViewTestCase):
+class InvalidPostUpdateTests(PostUpdateViewTestCase):
     def setUp(self):
         super().setUp()
         self.client.login(username=self.username, password=self.password)
