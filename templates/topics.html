@@ -28,13 +28,27 @@
         </thead>
         <tbody>
         {% for topic in topics %}
+            {% url 'topic_posts' topic.board.id topic.id as topic_url %}
             <tr>
-                <td class="align-middle"><a href="{% url 'topic_posts' topic.board.id topic.id %}"
-                       class="text-decoration-none">{{ topic.subject|truncatechars:60 }}</a></td>
+                <td class="align-middle">
+                    <p class="mb-0">
+                        <a href="{{ topic_url }}" class="text-decoration-none">{{ topic.subject|truncatechars:60 }}</a>
+                    </p>
+                    <small class="text-muted">
+                        Pages:
+                        {% for i in topic.get_page_range %}
+                            <a href="{{ topic_url }}?page={{ i }}" class="text-decoration-none">{{ i }}</a>
+                        {% endfor %}
+                        {% if topic.has_many_pages %}
+                            {{ topic.ELLIPSIS }}
+                            <a href="{{ topic_url }}?page={{ topic.get_page_count }}" class="text-decoration-none">Last page</a>
+                        {% endif %}
+                    </small>
+                </td>
                 <td class="align-middle">{{ topic.starter.username }}</td>
                 <td class="align-middle">{{ topic.replies }}</td>
                 <td class="align-middle">{{ topic.views }}</td>
-                <td>{{ topic.last_updated|naturaltime }}</td>
+                <td class="align-middle">{{ topic.last_updated|naturaltime }}</td>
             </tr>
         {% endfor %}
         </tbody>
