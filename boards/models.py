@@ -1,7 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils.safestring import mark_safe
 from django.utils.text import Truncator
-
+from markdown import markdown
 
 class User(AbstractUser):
     email = models.EmailField('email address', unique=True)
@@ -43,3 +44,6 @@ class Post(models.Model):
     def __str__(self):
         truncated_message = Truncator(self.message)
         return truncated_message.chars(30)
+
+    def get_message_markdown(self):
+        return mark_safe(markdown(self.message))

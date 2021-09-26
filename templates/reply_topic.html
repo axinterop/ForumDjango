@@ -13,6 +13,10 @@
     <li class="breadcrumb-item active">Post a reply</li>
 {% endblock %}
 
+{% block stylesheet %}
+    <link rel="stylesheet" href="{% static 'css/simplemde.min.css' %}">
+{% endblock %}
+
 {% block content %}
     <form method="post" class="mb-3" novalidate>
         {% csrf_token %}
@@ -32,9 +36,16 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-12">{{ post.message }}</div>
+                    <div class="col-12">{{ post.get_message_markdown }}</div>
                 </div>
             </div>
         </div>
     {% endfor %}
+{% endblock %}
+
+{% block javascript %}
+    <script src="{% static 'js/simplemde.min.js '%}"></script>
+    <script>
+        var simplemde = new SimpleMDE();
+    </script>
 {% endblock %}

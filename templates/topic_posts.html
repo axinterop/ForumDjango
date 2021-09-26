@@ -19,8 +19,8 @@
         <a href="{% url 'reply_topic' topic.board.id topic.id %}" class="btn btn-primary">Reply</a>
     </div>
     {% for post in posts %}
-        <div class="card mb-2 {% if forloop.first %}border-dark{% endif %}">
-            {% if forloop.first %}
+        <div class="card mb-2 {% if forloop.first and page_obj.number == 1 %}border-dark{% endif %}">
+            {% if forloop.first and page_obj.number == 1 %}
                 <div class="card-header text-white bg-dark">
                     {{ topic.subject }}
                 </div>
@@ -41,7 +41,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-12">{{ post.message }}</div>
+                            <div class="col-12">{{ post.get_message_markdown }}</div>
                         </div>
                         {% if post.created_by == user %}
                             <div class="row mt-3">
