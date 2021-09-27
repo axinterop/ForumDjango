@@ -83,7 +83,12 @@
                                                     Edit
                                                 </a>
                                             </li>
-                                            <li><a class="dropdown-item" href="#">Delete</a></li>
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   href="{% url 'delete_post' post.topic.board.id post.topic.id post.id %}">
+                                                    Delete
+                                                </a>
+                                            </li>
                                         {% endif %}
                                     </ul>
                                 </div>

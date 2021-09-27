@@ -33,13 +33,14 @@ class Topic(models.Model):
     views = models.PositiveIntegerField(default=0)
 
     ELLIPSIS = '...'
+    posts_per_page = 20
 
     def __str__(self):
         return self.subject
 
     def get_page_count(self):
         count = self.posts.count()
-        pages = count / 20
+        pages = count / self.posts_per_page
         return math.ceil(pages)
 
     def has_many_pages(self, count=None):
@@ -68,6 +69,14 @@ class Post(models.Model):
     def __str__(self):
         truncated_message = Truncator(self.message)
         return truncated_message.chars(30)
+
+    def get_page(self):
+        plist = list(self.topic.posts.values_list('pk', flat=True).order_by('created_at'))
+        position = 1
+        if len(plist) > 1:
+            position += 1  # + 1 for topic's initial post
+        page = math.ceil(position / self.topic.posts_per_page)
+        return page
 
     def get_message_markdown(self):
         return mark_safe(markdown(self.message))

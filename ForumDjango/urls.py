@@ -31,6 +31,8 @@ urlpatterns = [
     path('boards/<int:board_id>/topics/<int:topic_id>/reply/', boards_views.reply_topic, name='reply_topic'),
     path('boards/<int:board_id>/topics/<int:topic_id>/posts/<int:post_id>/edit/',
          boards_views.PostUpdateView.as_view(), name='edit_post'),
+    path('boards/<int:board_id>/topics/<int:topic_id>/posts/<int:post_id>/delete/',
+         boards_views.PostDeleteView.as_view(), name='delete_post'),
 
     # accounts_views
     path('signup/', accounts_views.signup, name='signup'),

@@ -1,15 +1,14 @@
-from boards.models import User
-from django.forms import ModelForm
 from django.test import TestCase
 from django.urls import reverse, resolve
 
-from boards.models import Board, Post, Topic
-from boards.views import PostUpdateView
+from boards.models import Post, Topic, Board
+from boards.models import User
+from boards.views import PostDeleteView
 
 
-class PostUpdateViewTestCase(TestCase):
+class PostDeleteViewTestCase(TestCase):
     """
-    Base test case to be used in all `PostUpdateView` view tests
+    Base test case to be used in all `PostDeleteView` view tests
     """
 
     def setUp(self):
@@ -19,19 +18,19 @@ class PostUpdateViewTestCase(TestCase):
         user = User.objects.create_user(username=self.username, email='john@doe.com', password=self.password)
         self.topic = Topic.objects.create(subject="Hello, world!", board=self.board, starter=user)
         self.post = Post.objects.create(message="Lorem ipsum dolor sit amet", topic=self.topic, created_by=user)
-        self.url = reverse('edit_post', kwargs={
+        self.url = reverse('delete_post', kwargs={
             'board_id': self.board.id, 'topic_id': self.topic.id, 'post_id': self.post.id
         })
 
 
-class LoginRequiredPostUpdateViewTests(PostUpdateViewTestCase):
+class LoginRequiredPostDeleteViewTests(PostDeleteViewTestCase):
     def test_redirection(self):
         login_url = reverse('login')
         response = self.client.get(self.url)
         self.assertRedirects(response, '{}?next={}'.format(login_url, self.url))
 
 
-class UnauthorizedPostUpdateViewTests(PostUpdateViewTestCase):
+class UnauthorizedPostDeleteViewTests(PostDeleteViewTestCase):
     def setUp(self):
         """
         Create a new user different from the one who posted
@@ -45,13 +44,13 @@ class UnauthorizedPostUpdateViewTests(PostUpdateViewTestCase):
 
     def test_status_code(self):
         """
-        A post should be edited only by the owner.
+        A post should be delete only by the owner.
         Unauthorized users should get a 404 response (Page Not Found)
         """
         self.assertEquals(self.response.status_code, 404)
 
 
-class PostUpdateViewTests(PostUpdateViewTestCase):
+class PostDeleteViewTests(PostDeleteViewTestCase):
     def setUp(self):
         super().setUp()
         self.client.login(username=self.username, password=self.password)
@@ -61,57 +60,40 @@ class PostUpdateViewTests(PostUpdateViewTestCase):
         self.assertEquals(self.response.status_code, 200)
 
     def test_view_function(self):
-        view = resolve('/boards/1/topics/1/posts/1/edit/')
-        self.assertEquals(view.func.view_class, PostUpdateView)
+        view = resolve('/boards/1/topics/1/posts/1/delete/')
+        self.assertEquals(view.func.view_class, PostDeleteView)
 
     def test_csrf(self):
         self.assertContains(self.response, 'csrfmiddlewaretoken')
 
-    def test_contains_form(self):
-        form = self.response.context.get('form')
-        self.assertIsInstance(form, ModelForm)
-
-    def test_form_inputs(self):
+    def test_contains_confirm_btn(self):
         """
-        The view must contain csrf input and textarea
+        The view must contain csrf and button
         """
         self.assertContains(self.response, '<input', 1)
-        self.assertContains(self.response, '<textarea', 1)
+        self.assertContains(self.response, 'name="delete_submit"', 1)  # <button name="delete_submit" ...
 
 
-class SuccessfulPostUpdateTests(PostUpdateViewTestCase):
+class SuccessfulPostDeleteTests(PostDeleteViewTestCase):
     def setUp(self):
         super().setUp()
         self.client.login(username=self.username, password=self.password)
-        self.response = self.client.post(self.url, {'message': 'edited message'})
+        self.response = self.client.post(self.url)
 
     def test_redirection(self):
         """
         A valid form submission should redirect the user to `topic_posts` view
-        and show him the edited post
+        and show him the page where the post was deleted
         """
         topic_posts_url = reverse('topic_posts', kwargs={'board_id': self.board.id, 'topic_id': self.topic.id})
-        url = '{url}?page={page}#{id}'.format(
+        url = '{url}?page={page}'.format(
             url=topic_posts_url,
             page=self.post.get_page(),
-            id=self.post.id,
         )
         self.assertRedirects(self.response, url)
 
-    def test_post_changed(self):
-        self.post.refresh_from_db()
-        self.assertEquals(self.post.message, 'edited message')
-
-
-class InvalidPostUpdateTests(PostUpdateViewTestCase):
-    def setUp(self):
-        super().setUp()
-        self.client.login(username=self.username, password=self.password)
-        self.response = self.client.post(self.url, {})
-
-    def test_status_code(self):
-        self.assertEquals(self.response.status_code, 200)
-
-    def test_form_errors(self):
-        form = self.response.context.get('form')
-        self.assertTrue(form.errors)
+    def test_post_deleted(self):
+        """
+        After deleting the post, the total post count should be 0
+        """
+        self.assertEquals(Post.objects.count(), 0)

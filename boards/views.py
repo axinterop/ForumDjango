@@ -1,10 +1,11 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.decorators import method_decorator
-from django.views.generic import UpdateView, ListView
+from django.views.generic import UpdateView, ListView, DeleteView
 
 from boards.forms import NewTopicForm, PostForm
 from boards.models import Board, Post, Topic
@@ -103,7 +104,6 @@ def reply_topic(request, board_id, topic_id):
                 id=post.id,
                 page=topic.get_page_count()
             )
-            print(topic.get_page_count())
             return redirect(topic_post_url)
     else:
         form = PostForm()
@@ -114,8 +114,7 @@ def reply_topic(request, board_id, topic_id):
     return render(request, 'boards/reply_topic.html', context)
 
 
-@method_decorator(login_required, name='dispatch')
-class PostUpdateView(UpdateView):
+class PostUpdateView(LoginRequiredMixin, UpdateView):
     model = Post
     fields = ('message',)
     template_name = 'boards/edit_post.html'
@@ -132,4 +131,37 @@ class PostUpdateView(UpdateView):
         post.updated_by = self.request.user
         post.updated_at = timezone.now()
         post.save()
-        return redirect('topic_posts', board_id=post.topic.board.id, topic_id=post.topic.id)
+
+        topic_url = reverse('topic_posts', kwargs={
+            'board_id': post.topic.board.id,
+            'topic_id': post.topic.id,
+        })
+        success_url = '{url}?page={page}#{id}'.format(
+            url=topic_url,
+            id=post.id,
+            page=post.get_page(),
+        )
+        return redirect(success_url)
+
+
+class PostDeleteView(LoginRequiredMixin, DeleteView):
+    model = Post
+    template_name = 'boards/delete_post.html'
+    pk_url_kwarg = 'post_id'
+    context_object_name = 'post'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        # Prevents non-owners from deleting the post
+        return queryset.filter(created_by=self.request.user)
+
+    def get_success_url(self):
+        topic_url = reverse('topic_posts', kwargs={
+            'board_id': self.kwargs.get('board_id'),
+            'topic_id': self.kwargs.get('topic_id'),
+        })
+        success_url = '{url}?page={page}'.format(
+            url=topic_url,
+            page=self.object.get_page()
+        )
+        return success_url
