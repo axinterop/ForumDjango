@@ -17,6 +17,7 @@ class PostDeleteViewTestCase(TestCase):
         self.password = '123'
         user = User.objects.create_user(username=self.username, email='john@doe.com', password=self.password)
         self.topic = Topic.objects.create(subject="Hello, world!", board=self.board, starter=user)
+        self.post_initial = Post.objects.create(message="Initial post", topic=self.topic, created_by=user)
         self.post = Post.objects.create(message="Lorem ipsum dolor sit amet", topic=self.topic, created_by=user)
         self.url = reverse('delete_post', kwargs={
             'board_id': self.board.id, 'topic_id': self.topic.id, 'post_id': self.post.id
@@ -82,7 +83,7 @@ class SuccessfulPostDeleteTests(PostDeleteViewTestCase):
 
     def test_redirection(self):
         """
-        A valid form submission should redirect the user to `topic_posts` view
+        A valid post deletion should redirect the user to `topic_posts` view
         and show him the page where the post was deleted
         """
         topic_posts_url = reverse('topic_posts', kwargs={'board_id': self.board.id, 'topic_id': self.topic.id})
@@ -94,6 +95,35 @@ class SuccessfulPostDeleteTests(PostDeleteViewTestCase):
 
     def test_post_deleted(self):
         """
-        After deleting the post, the total post count should be 0
+        After deleting the post, the total post count should be 1 (initial post remains)
+        """
+        self.assertEquals(Post.objects.count(), 1)
+
+
+class InitialPostDeleteTestCase(PostDeleteViewTestCase):
+    def setUp(self):
+        super().setUp()
+        self.client.login(username=self.username, password=self.password)
+        url_post_initial = reverse('delete_post', kwargs={
+            'board_id': self.board.id, 'topic_id': self.topic.id, 'post_id': self.post_initial.id
+        })
+        self.response = self.client.post(url_post_initial)
+
+    def test_redirection(self):
+        """
+        A valid initial post deletion should redirect the user to `board_topics` view
+        """
+        board_topics_url = reverse('board_topics', kwargs={'board_id': self.board.id})
+        self.assertRedirects(self.response, board_topics_url)
+
+    def test_topic_deleted(self):
+        """
+        After deleting the initial post, the total topic count should be 0
+        """
+        self.assertEquals(Topic.objects.count(), 0)
+
+    def test_post_deleted(self):
+        """
+        After deleting the initial post, the total post count should be 0
         """
         self.assertEquals(Post.objects.count(), 0)

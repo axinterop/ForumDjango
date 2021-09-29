@@ -84,9 +84,9 @@
                                                 </a>
                                             </li>
                                             <li>
-                                                <a class="dropdown-item"
+                                                <a class="dropdown-item text-danger"
                                                    href="{% url 'delete_post' post.topic.board.id post.topic.id post.id %}">
-                                                    Delete
+                                                    Delete {% if forloop.first and page_obj.number == 1%}topic{% endif %}
                                                 </a>
                                             </li>
                                         {% endif %}

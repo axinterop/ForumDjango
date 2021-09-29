@@ -71,12 +71,18 @@ class Post(models.Model):
         return truncated_message.chars(30)
 
     def get_page(self):
-        plist = list(self.topic.posts.values_list('pk', flat=True).order_by('created_at'))
+        plist = list(self.topic.posts.values_list('id', flat=True).order_by('created_at'))
         position = 1
         if len(plist) > 1:
+            position = plist.index(self.id)
             position += 1  # + 1 for topic's initial post
         page = math.ceil(position / self.topic.posts_per_page)
         return page
 
     def get_message_markdown(self):
         return mark_safe(markdown(self.message))
+
+    def is_initial(self):
+        if self == self.topic.posts.order_by('created_at').first():
+            return True
+        return False

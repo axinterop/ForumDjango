@@ -1,7 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count
-from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
@@ -149,6 +148,16 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
     template_name = 'boards/delete_post.html'
     pk_url_kwarg = 'post_id'
     context_object_name = 'post'
+
+    def delete(self, request, *args, **kwargs):
+        current_post = self.get_object()
+
+        if current_post.is_initial():
+            current_post.topic.delete()
+            board_id = self.kwargs.get('board_id')
+            return redirect(reverse('board_topics', kwargs={'board_id': board_id}))
+        else:
+            return super().delete(request, *args, **kwargs)
 
     def get_queryset(self):
         queryset = super().get_queryset()

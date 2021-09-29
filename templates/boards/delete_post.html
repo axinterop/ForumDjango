@@ -26,6 +26,37 @@
 {% endblock %}
 
 {% block content %}
+    {% if post.is_initial %}
+        <div class="alert alert-danger">
+            <div class="fs-5 mb-3">
+                Since this post is a topic initialization, you can't delete it without deleting the topic.
+                <strong>If you delete a topic, all posts in it will also be irretrievably deleted</strong>.
+                If you do not know what you are doing, we recommend that you cancel the request by clicking <strong>"Cancel"</strong>.
+            </div>
+            <div>
+                Topic's name: <strong>{{ post.topic.subject }}</strong>
+            </div>
+            <div>
+                Topic's board: <strong>{{ post.topic.board.name }}</strong>
+            </div>
+            <div>
+                Topic's views: <strong>{{ post.topic.views }}</strong>
+            </div>
+            <div>
+                Amount of posts: <strong>{{ post.topic.posts.count }}</strong>
+            </div>
+        </div>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <button name="delete_submit" type="submit" class="btn btn-danger">Delete <span class="fw-bold">topic</span>
+            </button>
+            {% url 'topic_posts' post.topic.board.id post.topic.id as topic_url %}
+            <a href="{{ topic_url }}?page={{ post.get_page }}#{{ post.id }}"
+               class="btn btn-outline-secondary">
+                Cancel
+            </a>
+        </form>
+    {% else %}
         <div class="card pt-0">
             <div class="card-header alert alert-danger">
                 You are going to delete next post:
@@ -44,16 +75,16 @@
                 </div>
             </div>
             <div class="card-footer border-top">
-                    <form method="post" novalidate>
-                        {% csrf_token %}
-                        <button name="delete_submit" type="submit" class="btn btn-danger">Delete</button>
-                        {% url 'topic_posts' post.topic.board.id post.topic.id as topic_url %}
-                        <a href="{{ topic_url }}?page={{ post.get_page }}#{{ post.id }}"
-                           class="btn btn-outline-secondary">
-                            Cancel
-                        </a>
-                    </form>
-                </div>
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <button name="delete_submit" type="submit" class="btn btn-danger">Delete</button>
+                    {% url 'topic_posts' post.topic.board.id post.topic.id as topic_url %}
+                    <a href="{{ topic_url }}?page={{ post.get_page }}#{{ post.id }}"
+                       class="btn btn-outline-secondary">
+                        Cancel
+                    </a>
+                </form>
+            </div>
         </div>
-    </div>
+    {% endif %}
 {% endblock %}
