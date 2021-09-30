@@ -14,7 +14,7 @@ Django Forum is a simple project that I created to practice the Django Web Frame
    ```git
    git clone https://github.com/axinterop/ForumDjango.git
    ```
-3. Create and active the virtual enviroment.
+3. Create and activate the virtual enviroment.
 4. Install all the dependencies from requirements.txt:
    ```bash
    pip install -r requirements.txt
