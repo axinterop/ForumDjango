@@ -4,6 +4,7 @@ Django Forum is a simple project that I created to practice the Django Web Frame
 
 ## Features
 - Ready Bootstrap-themed pages
+- User password reset
 - User Sign up/Log in
 - Gravatars
 
@@ -44,3 +45,20 @@ In case if you want to empty the database, enter the next command:
 ```bash
 py manage.py flush --noinput
 ```
+
+## Screenshots
+### Home page
+![127 0 0 1_8000_](https://user-images.githubusercontent.com/40664776/135628988-c034c30a-7320-4fd9-bcf2-ef347bb6b139.png)
+---
+### Topics
+![127 0 0 1_8000_boards_1_](https://user-images.githubusercontent.com/40664776/135629035-b0334590-90da-4802-aec6-9887ecf765ca.png)
+---
+### Posts
+![127 0 0 1_8000_boards_1_topics_1](https://user-images.githubusercontent.com/40664776/135631760-ee020fe5-7cce-4fd9-961a-b03d27a2726f.png)
+---
+### Log in
+![127 0 0 1_8000_login_](https://user-images.githubusercontent.com/40664776/135629067-c2704300-fa15-44c2-ae1e-1ccee77969ff.png)
+---
+### Password reset
+![127 0 0 1_8000_reset_](https://user-images.githubusercontent.com/40664776/135629072-d52e5dd4-9c5b-4a66-a2ad-6a191c887317.png)
+
