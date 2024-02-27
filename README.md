@@ -22,7 +22,11 @@ Django Forum is a simple project that I created to practice the Django Web Frame
    ```
 5. Migrate:
    ```bash
-   py manage.py migrate
+   python manage.py migrate
+   ```
+6. Run the server:
+   ```bash
+   python manage.py runserver
    ```
 
 ### Database auto-population (optional)
@@ -39,7 +43,7 @@ If you want to look at a project with a populated database, follow these steps:
    All information related to the script **will be written to the console** after it is finished.
 8. Run the server:
    ```bash
-   py manage.py runserver
+   python manage.py runserver
    ```
 In case if you want to empty the database, enter the next command:
 ```bash
